@@ -8,19 +8,22 @@ import { Usuario } from './../classes/usuario';
 export const usuariosConectados = new UsuariosLista;
 
 
-export const conectarCliente = (cliente: Socket ) => {
+export const conectarCliente = (cliente: Socket, io: Server ) => {
 
     const usuario = new Usuario( cliente.id );
     usuariosConectados.agregar(usuario);
 
 }
 
-export const desconectar = (cliente: Socket) => {
+export const desconectar = (cliente: Socket, io: Server) => {
 
     cliente.on('disconnect', () => {
         console.log('Cliente desconectado');
 
         usuariosConectados.borrarUsuario( cliente.id );
+
+        io.emit( 'usuarios-activos', usuariosConectados.getLista() );
+
     });
 
 }
@@ -39,11 +42,20 @@ export const login = (cliente: Socket, io: Server) => {
 
         usuariosConectados.actualizarNombre( cliente.id, payload.nombre );
 
+        io.emit( 'usuarios-activos', usuariosConectados.getLista() );
+
         callback({
             ok: true,
             mensaje: 'Configurado correctamente'
         });
 
         // io.emit('Usuario configurado', payload.nombre );
+    })
+}
+
+export const obtenerUsuarios = (cliente: Socket, io: Server) => {
+    cliente.on('obtener-usuarios', () => {
+        console.log('Obtener usuarios');
+        io.in( cliente.id ).emit('usuarios-activos', usuariosConectados.getLista() );
     })
 }

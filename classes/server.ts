@@ -41,7 +41,7 @@ export default class Servidor{
 
         // console.log(cliente.id );
 
-        socket.conectarCliente( cliente );
+        socket.conectarCliente( cliente, this.io );
 
 
         // cliente.on('disconnect', () => {
@@ -49,9 +49,11 @@ export default class Servidor{
         // });
         socket.login(cliente, this.io);
 
+        socket.obtenerUsuarios( cliente, this.io );
+
         socket.mensaje(cliente, this.io);
 
-        socket.desconectar(cliente);
+        socket.desconectar(cliente, this.io);
       });
 
     }
